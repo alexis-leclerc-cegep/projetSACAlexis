@@ -37,6 +37,8 @@
 MyOled *myOled = NULL;
 #include <MyOledViewWorking.h>
 MyOledViewWorking *myOledViewWorking = NULL;
+#include <MyOledViewWifiAP.h>
+MyOledViewWifiAP *myOledViewWifiAP = NULL;
 
 
 #include <string>
@@ -62,18 +64,27 @@ std::string CallBackMessageListener(std::string message) {
 }
 
 void setup() {
-  myOled = new MyOled(&Wire, 128, 64, -1);
+  Serial.begin(115200);
+  myOled = new MyOled(&Wire, -1, 64, 128);
   myOled->init();
   myOledViewWorking = new MyOledViewWorking();
+  myOledViewWifiAP = new MyOledViewWifiAP();
   //myOledViewWorking->setParams("chepo".c_str(), "chepo".c_str(), "chepo".c_str(), "chepo".c_str());
-  myOled->displayView(myOledViewWorking);
 
 
 
-  dht.begin();                                              //Initialisation du capteur DHT
   delay(100);
 
-  wm.autoConnect(SSID, PASSWORD);                           //On se connecte au réseau WiFi
+  if(!wm.autoConnect(SSID, PASSWORD)){
+    myOledViewWifiAP->setNomDuSysteme("SACTemperature"); //mettre variable
+    myOledViewWifiAP->setSSIDDuSysteme(SSID);
+    myOledViewWifiAP->setPassDuSysteme(PASSWORD); 
+    myOled->displayView(myOledViewWifiAP);
+    Serial.println("Failed to connect and hit timeout");
+    delay(3000);
+    //reset and try again, or maybe put it to deep sleep
+  };                           //On se connecte au réseau WiFi
+
 
   // ----------- Routes du serveur ----------------
   myServer = new MyServer(80);
