@@ -31,7 +31,12 @@
 #include <Arduino.h>                                        //Le framework Arduino
 #include "DHT.h"                                            //Inclure la librairie pour intéragir avec le DHT22
 #include <HTTPClient.h>
+#include <Wire.h>
 #include <WiFiManager.h>
+#include <MyOled.h>
+MyOled *myOled = NULL;
+#include <MyOledViewWorking.h>
+MyOledViewWorking *myOledViewWorking = NULL;
 
 
 #include <string>
@@ -57,6 +62,14 @@ std::string CallBackMessageListener(std::string message) {
 }
 
 void setup() {
+  myOled = new MyOled(&Wire, 128, 64, -1);
+  myOled->init();
+  myOledViewWorking = new MyOledViewWorking();
+  //myOledViewWorking->setParams("chepo".c_str(), "chepo".c_str(), "chepo".c_str(), "chepo".c_str());
+  myOled->displayView(myOledViewWorking);
+
+
+
   dht.begin();                                              //Initialisation du capteur DHT
   delay(100);
 
