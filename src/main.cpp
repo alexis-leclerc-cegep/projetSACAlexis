@@ -82,7 +82,6 @@ void setup() {
     myOled->displayView(myOledViewWifiAP);
     Serial.println("Failed to connect and hit timeout");
     delay(3000);
-    //reset and try again, or maybe put it to deep sleep
   };                           //On se connecte au réseau WiFi
 
 
