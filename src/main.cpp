@@ -51,6 +51,7 @@ MyServer *myServer = NULL;
 #define DHTPIN 4
 #define DHTTYPE DHT22                                       //On définit le type de DHT comme étant un DHT22  
 
+const char *NOM_SYSTEME = "SAC System";
 const char *SSID = "TemperatureESP";
 const char *PASSWORD = "CodeSecret";
 
@@ -70,19 +71,13 @@ void setup() {
   myOledViewWifiAP = new MyOledViewWifiAP();
   //myOledViewWorking->setParams("chepo".c_str(), "chepo".c_str(), "chepo".c_str(), "chepo".c_str());
 
-  myOledViewWifiAP->setNomDuSysteme("SACTemperature"); //mettre variable
+  myOledViewWifiAP->setNomDuSysteme(NOM_SYSTEME); //mettre variable
   myOledViewWifiAP->setSSIDDuSysteme(SSID);
   myOledViewWifiAP->setPassDuSysteme(PASSWORD); 
   myOled->displayView(myOledViewWifiAP);
-  Serial.println("Failed to connect and hit timeout");
-  if(!wm.autoConnect(SSID, PASSWORD)){
-    myOledViewWifiAP->setNomDuSysteme("SACTemperature"); //mettre variable
-    myOledViewWifiAP->setSSIDDuSysteme(SSID);
-    myOledViewWifiAP->setPassDuSysteme(PASSWORD); 
-    myOled->displayView(myOledViewWifiAP);
-    Serial.println("Failed to connect and hit timeout");
-    delay(3000);
-  };                           //On se connecte au réseau WiFi
+  delay(3000);
+
+  wm.autoConnect(SSID, PASSWORD);
 
 
   // ----------- Routes du serveur ----------------
