@@ -34,5 +34,25 @@ void MyOledViewInitialisation::update(Adafruit_SSD1306 *adafruit){
 }
 
 void MyOledViewInitialisation::display(Adafruit_SSD1306 *adafruit){
+    adafruit->clearDisplay();
+
+    adafruit->setTextSize(2);
+    adafruit->setTextColor(WHITE);
+    adafruit->setCursor(0,0);
+    adafruit->print(nomDuSysteme.c_str());
+
+    adafruit->setTextSize(1);
+    adafruit->setCursor(0,20);
+    adafruit->print("INITIALISATION");
+
+    adafruit->setCursor(0,30);
+    adafruit->print("Bouton action: ");
+    adafruit->print(SensibiliteBoutonAction.c_str());
+
+    adafruit->setCursor(0,40);
+    adafruit->print("Bouton reset: ");
+    adafruit->print(SensibiliteBoutonReset.c_str());
+
+
 
 }
