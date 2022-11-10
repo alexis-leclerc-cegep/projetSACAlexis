@@ -6,6 +6,8 @@
 */
 #include <Arduino.h>
 #include "MyOledViewWifiAP.h"
+#include <Fonts/FreeMono12pt7b.h>
+#include <Fonts/FreeMono9pt7b.h>
 
 using namespace std;
 
@@ -35,16 +37,20 @@ void MyOledViewWifiAP::display( Adafruit_SSD1306 *adafruit) {
     adafruit->setTextColor(WHITE);
 
     adafruit->clearDisplay();
-    adafruit->setTextSize(2);
+    adafruit->setTextSize(1);
+    adafruit->setFont(&FreeMono12pt7b);
     adafruit->setCursor(0, 0);
     adafruit->print(nomDuSysteme.c_str());
 
     adafruit->setTextSize(1);
     adafruit->setCursor(0, 20);
-    adafruit->print("Id: ");
+    adafruit->setFont(&FreeMono9pt7b);
+    adafruit->print("SSID: ");
     adafruit->print(ssidDuSysteme.c_str());
     
-    adafruit->setCursor(40, 50);
+    adafruit->setCursor(0, 30);
+    adafruit->setFont(&FreeMono9pt7b);
+    adafruit->print("Password: ");
     adafruit->print(passDuSysteme.c_str());
 
     adafruit->display();

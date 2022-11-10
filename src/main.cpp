@@ -35,8 +35,6 @@
 #include <WiFiManager.h>
 #include <MyOled.h>
 MyOled *myOled = NULL;
-#include <MyOledViewWorking.h>
-MyOledViewWorking *myOledViewWorking = NULL;
 #include <MyOledViewWifiAP.h>
 MyOledViewWifiAP *myOledViewWifiAP = NULL;
 
@@ -64,17 +62,19 @@ std::string CallBackMessageListener(std::string message) {
 }
 
 void setup() {
+  WiFi.disconnect();
   Serial.begin(115200);
+  Serial.println("dans le nouveau programme");
   myOled = new MyOled(&Wire, -1, 64, 128);
   myOled->init();
-  myOledViewWorking = new MyOledViewWorking();
   myOledViewWifiAP = new MyOledViewWifiAP();
   //myOledViewWorking->setParams("chepo".c_str(), "chepo".c_str(), "chepo".c_str(), "chepo".c_str());
 
-
-
-  delay(100);
-
+  myOledViewWifiAP->setNomDuSysteme("SACTemperature"); //mettre variable
+  myOledViewWifiAP->setSSIDDuSysteme(SSID);
+  myOledViewWifiAP->setPassDuSysteme(PASSWORD); 
+  myOled->displayView(myOledViewWifiAP);
+  Serial.println("Failed to connect and hit timeout");
   if(!wm.autoConnect(SSID, PASSWORD)){
     myOledViewWifiAP->setNomDuSysteme("SACTemperature"); //mettre variable
     myOledViewWifiAP->setSSIDDuSysteme(SSID);
@@ -92,4 +92,5 @@ void setup() {
 }
 
 void loop() {
+
 }
