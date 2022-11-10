@@ -348,8 +348,8 @@ boolean WiFiManager::autoConnect(char const *apName, char const *apPassword) {
   } 
 
   // not connected start configportal
-  bool res = startConfigPortal(apName, apPassword);
-  return res;
+  startConfigPortal(apName, apPassword);
+  return false;
 }
 
 bool WiFiManager::setupHostname(bool restart){
