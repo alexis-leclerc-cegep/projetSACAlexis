@@ -7,6 +7,7 @@
 */
 #include <Arduino.h>
 #include "MyServer.h"
+#include <ArduinoJson.h>
 using namespace std;
 
 typedef std::string (*CallbackType)(std::string);
@@ -36,6 +37,49 @@ void MyServer::initAllRoutes() {
     this->on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/script.js", "text/javascript");
         });
+
+this->on("/getAllWoodOptions", HTTP_GET, [](AsyncWebServerRequest *request) {
+        Serial.println("getAllWoodOptions... ");
+
+        HTTPClient http;
+        String woodApiRestAddress = "http://51.79.84.135:9999/api/woodlist";
+        http.begin(woodApiRestAddress);
+        http.setAuthorization("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsYSIsImlhdCI6MTY2MTUxNjAzNX0.4eGrq5XuJM1AcFnrxsRLHZp7e7E6v_u8lh6gEVAoU0Q");
+        http.GET();
+        String response = http.getString();
+
+        String tempToSend;
+        StaticJsonDocument<2048> doc;
+        deserializeJson(doc, response);
+        JsonObject obj1 = doc.as<JsonObject>();
+        std::string wood;
+        String  woodName;
+      
+        for (JsonPair kv1 : obj1) {
+            wood = kv1.key().c_str();
+            Serial.print("Element : ");Serial.println(wood.c_str());
+
+            JsonObject elem = obj1[wood];
+            woodName = elem["name"].as<String>();
+            if(tempToSend!="") tempToSend += "&";
+            tempToSend +=  String(wood.c_str()) + String("&") + String(woodName.c_str());
+           
+            Serial.print(woodName);Serial.print(" ");
+                          
+            //Pour parcourir les éléments de l'objet
+            //for (JsonPair kv2 : elem) {
+            //    Serial.print("   Sous element : ");Serial.print(kv2.key().c_str());
+            //    Serial.print("    :  ");Serial.println(kv2.value().as<char*>());
+            //    }
+            }
+        
+        request->send(200, "text/plain", tempToSend);
+    });
+
+
+
+
+
 
     
     this->begin();

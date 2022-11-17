@@ -29,6 +29,7 @@
  */
 
 #include <Arduino.h>                                        //Le framework Arduino
+#include "MyFunctions.cpp"
 #include "DHT.h"                                            //Inclure la librairie pour intéragir avec le DHT22
 #include <HTTPClient.h>
 #include <Wire.h>
@@ -60,6 +61,10 @@ DHT dht(DHTPIN, DHTTYPE);
 
 
 std::string CallBackMessageListener(std::string message) {
+  const char * action = getValue(message, '|', 0).c_str();
+  if (strcmp(action, "GetWoodList") == 0) {
+
+  }
 }
 
 void setup() {
