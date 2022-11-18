@@ -30,6 +30,7 @@ void MyServer::initAllRoutes() {
 
     //Route initiale (page html)
     this->on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+        Serial.println("Dans la route /");
         request->send(SPIFFS, "/index.html", "text/html");
         });
 
@@ -42,16 +43,20 @@ this->on("/getAllWoodOptions", HTTP_GET, [](AsyncWebServerRequest *request) {
         Serial.println("getAllWoodOptions... ");
 
         HTTPClient http;
-        String woodApiRestAddress = "http://51.79.84.135:9999/api/woodlist";
+        String woodApiRestAddress = "http://51.79.84.135:2223/api/woodlist";
+        String response = "Error";
+        //String woodApiRestAddress = "http://ip.me";
         bool beginResult = http.begin(woodApiRestAddress);
         if(!beginResult){
             Serial.println("Erreur de connection au serveur");
         }
         else{
             Serial.println("Connection au serveur réussie");
-            http.addHeader("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsYSIsImlhdCI6MTY2MTUxNjAzNX0.4eGrq5XuJM1AcFnrxsRLHZp7e7E6v_u8lh6gEVAoU0Q");
+            http.addHeader("authorization ", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsYSIsImlhdCI6MTY2MTUxNjAzNX0.4eGrq5XuJM1AcFnrxsRLHZp7e7E6v_u8lh6gEVAoU0Q");
             http.GET();
-            String response = http.getString();
+            response = http.getString();
+            //if(response[response.length()-1]==']') response[response.length()-1] = ' ';
+            //if(response[0]=='[') response[0] = ' ';
             Serial.println(response);
             http.end();
         }
@@ -90,14 +95,8 @@ this->on("/getAllWoodOptions", HTTP_GET, [](AsyncWebServerRequest *request) {
         
         */
         //request->send(200, "text/plain", tempToSend);
-        request->send(200, "text/plain", "okgood");
+        request->send(200, "text/plain", response);
     });
 
-
-
-
-
-
-    
     this->begin();
 };
