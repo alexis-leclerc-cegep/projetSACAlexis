@@ -39,6 +39,11 @@ void MyServer::initAllRoutes() {
         request->send(SPIFFS, "/script.js", "text/javascript");
         });
 
+    this->on("/lireTemp", HTTP_GET, [](AsyncWebServerRequest *request) {
+        Serial.println("Dans la route /lireTemp");
+        request->send(200, "text/plain", "23.5");
+    });
+
 this->on("/getAllWoodOptions", HTTP_GET, [](AsyncWebServerRequest *request) {
         Serial.println("getAllWoodOptions... ");
 
@@ -52,7 +57,7 @@ this->on("/getAllWoodOptions", HTTP_GET, [](AsyncWebServerRequest *request) {
         }
         else{
             Serial.println("Connection au serveur réussie");
-            http.addHeader("authorization ", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsYSIsImlhdCI6MTY2MTUxNjAzNX0.4eGrq5XuJM1AcFnrxsRLHZp7e7E6v_u8lh6gEVAoU0Q");
+            http.addHeader("authorization", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsYSIsImlhdCI6MTY2MTUxNjAzNX0.4eGrq5XuJM1AcFnrxsRLHZp7e7E6v_u8lh6gEVAoU0Q");
             http.GET();
             response = http.getString();
             //if(response[response.length()-1]==']') response[response.length()-1] = ' ';

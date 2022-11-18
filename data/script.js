@@ -43,22 +43,19 @@ function getBois() {
         if (this.readyState == 4 && this.status == 200) {
             for(let i = 0; i < responseParsed.length; i++) {
                 console.log(responseParsed[i].name);
-                /*
-                var x = document.getElementById("typeBois_ListBox_Select");
+                var x = document.getElementById("dropDown_TypeBois");
                 var option = document.createElement("option");
                 option.value = arrayOfStrings[i];
                 option.text = arrayOfStrings[i+1];
                 x.add(option);
-                */
-                } 
+            } 
 
             //Refresh le contenu
-            var siteHeader = document.getElementById('typeBois_ListBox_Select');
+            var siteHeader = document.getElementById('dropDown_TypeBois');
             siteHeader.style.display='none';
             siteHeader.offsetHeight; // no need to store this anywhere, the reference is enough
             siteHeader.style.display='block';
-
-            }
+        }
     };
     xhttp.open("GET", "getAllWoodOptions", true);
     xhttp.send();
