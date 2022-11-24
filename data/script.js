@@ -40,13 +40,15 @@ function getBois() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         let responseParsed = JSON.parse(this.responseText)
+        let woodArray
         if (this.readyState == 4 && this.status == 200) {
             for(let i = 0; i < responseParsed.length; i++) {
-                console.log(responseParsed[i].name);
+                let currentWood = responseParsed[i].name;
+                let currentId = responseParsed[i].id;
                 var x = document.getElementById("dropDown_TypeBois");
                 var option = document.createElement("option");
-                option.value = arrayOfStrings[i];
-                option.text = arrayOfStrings[i+1];
+                option.value = currentId;
+                option.text = currentWood;
                 x.add(option);
             } 
 
@@ -57,10 +59,31 @@ function getBois() {
             siteHeader.style.display='block';
         }
     };
-    xhttp.open("GET", "getAllWoodOptions", true);
+    xhttp.open("GET", "getWoodName", true);
     xhttp.send();
 }
 
+function getWoodDetails(selectedObject){
+    id = selectedObject.value;
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function () {
+        console.log(this.responseText);
+        let responseParsed = this.responseText;
+        if (this.readyState == 4 && this.status == 200) {
+            document.getElementById("nomBois").innerHTML = selectedObject.innerHTML;
+            document.getElementById("typeBois").innerHTML = responseParsed.type;
+            document.getElementById("origineBois").innerHTML = responseParsed.origine;
+            document.getElementById("tempSechBois").innerHTML = responseParsed.drying;
+            document.getElementById("tempMinBois").innerHTML = responseParsed.temp;
+        }
+    }
+
+    xhttp.open("GET", "getWoodDetails?id=" + id, true);
+    xhttp.send();
+
+}
+
+/*
 getBois().then(data => {
     let option;
     console.log(data);
@@ -71,3 +94,4 @@ getBois().then(data => {
     });
 });
    
+*/

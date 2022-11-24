@@ -13,13 +13,13 @@
         <title id="nom">Test</title>
     </head>
 
-    <body onload="getNomFour(); getTemp();">
+    <body onload="getNomFour(); getBois();">
         <div style="float:left;">
             <image src="sac.png" alt="SAC" width="200" height="120">
             <h1 id="nom">Type de bois</h1>
             <div style="border-style: solid;">
-                <select id="dropDown_TypeBois" name="bois" style="border-radius: 5px;background-color: lightgreen;width: 100%;font-size: 100%;">
-                   <libellé>Type de bois</libellé>
+                <select onchange="getWoodDetails(this);" id="dropDown_TypeBois" name="bois" style="border-radius: 5px;background-color: lightgreen;width: 100%;font-size: 100%;">
+                   <label>Type de bois</label>
                 </select>
             </div>
             <h1>Caractéristiques</h1>
