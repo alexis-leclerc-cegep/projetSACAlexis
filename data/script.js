@@ -64,17 +64,18 @@ function getBois() {
 }
 
 function getWoodDetails(selectedObject){
-    id = selectedObject.value;
+    id = selectedObject.options[selectedObject.selectedIndex].value;
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
         console.log(this.responseText);
-        let responseParsed = this.responseText;
+        const responseParsed = JSON.parse(this.responseText.slice(1, -1));
+        console.table(responseParsed.type);
         if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("nomBois").innerHTML = selectedObject.innerHTML;
-            document.getElementById("typeBois").innerHTML = responseParsed.type;
-            document.getElementById("origineBois").innerHTML = responseParsed.origine;
-            document.getElementById("tempSechBois").innerHTML = responseParsed.drying;
-            document.getElementById("tempMinBois").innerHTML = responseParsed.temp;
+            document.getElementById("nomBois").text = ": " + selectedObject.options[selectedObject.selectedIndex].text;
+            document.getElementById("typeBois").text = ": " + responseParsed.type;
+            document.getElementById("origineBois").text = ": " + responseParsed.origine;
+            document.getElementById("tempSechBois").text = ": " + responseParsed.drying + " secondes";
+            document.getElementById("tempMinBois").text = ": " + responseParsed.temp + " °C";
         }
     }
 
