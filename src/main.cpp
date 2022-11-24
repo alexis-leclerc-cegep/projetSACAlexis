@@ -62,13 +62,15 @@ DHT dht(DHTPIN, DHTTYPE);
 
 std::string CallBackMessageListener(std::string message) {
   const char * action = getValue(message, '|', 0).c_str();
+  /*
   if (strcmp(action, "GetWoodList") == 0) {
 
   }
-  if(std::string(action.c_str()).compare(std::string("getTemp")) == 0) {
+  */
+  if(std::string(action).compare(std::string("getTemp")) == 0) {
     float t = dht.readTemperature();
     char buffer[10];
-    sprintf(buffer, "%g", t);
+    sprintf(buffer, "%g °C", t);
     return(buffer);
   }
 }

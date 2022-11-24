@@ -40,8 +40,9 @@ void MyServer::initAllRoutes() {
         });
 
     this->on("/lireTemp", HTTP_GET, [](AsyncWebServerRequest *request) {
-        Serial.println("Dans la route /lireTemp");
-        request->send(200, "text/plain", "23.5");
+        std::string repString = "";
+        if (ptrToCallBackFunction) repString = (*ptrToCallBackFunction)("getTemp");
+        request->send(200, "text/plain", repString.c_str());
     });
 
     this->on("/getWoodDetails", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -66,6 +67,9 @@ void MyServer::initAllRoutes() {
             }
 
             request->send(200, "text/plain", response);
+        }
+        else{
+            request->send(400, "text/plain", "Error: Missing params");
         };
     });
 
