@@ -58,7 +58,7 @@
         <div style="border-style: solid;">
             <h2 style="text-align: center;">Température du four</h2>
             <br>
-            <h3 style="color: blue;text-align: center;" id="temp">23.00 Celsius</h3>
+            <h3 style="color: blue;text-align: center;" id="temp">... C</h3>
             <br>
             <p style="text-align: center;"><input type="button"
                     style="background-color: skyblue;border-radius: 10px;width: 70%;font-size: 150%;"
@@ -67,8 +67,9 @@
             <br>
             <br>
             <br>
-            <div style="float: left;color: blue;margin-left: 8%;text-align: left;">Érable</div>
-            <div style="float: center;color: blue;margin-left: 8%;text-align: center;"> 0s / 20s (min:25 Celsius)
+            <div style="float: left;color: blue;margin-left: 8%;text-align: left;" id="nomBois2">Érable</div>
+            <div style="float: center;color: blue;margin-left: 8%;text-align: center;">
+                0s / <span id="tempSechBois2">20</span>s (min:<span id="tempMinBois2">... C</span>)
                 <a style="float: right;font-size: 100%;color: darkgreen;margin-right: 1%;">o</a><a
                     style="float: right;font-size: 100%;color: #cccc00;margin-right: 1%;">o</a><a
                     style="float: right;font-size: 100%;color: darkred;margin-right: 1%;">o</a></div>

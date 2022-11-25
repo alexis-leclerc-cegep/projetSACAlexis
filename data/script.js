@@ -57,18 +57,16 @@ function getBois() {
             siteHeader.style.display='none';
             siteHeader.offsetHeight; // no need to store this anywhere, the reference is enough
             siteHeader.style.display='block';
+
+            getWoodDetails(document.getElementById("dropDown_TypeBois"));
         }
     };
     xhttp.open("GET", "getWoodName", true);
     xhttp.send();
 }
 
-function getWoodDetails(selectedObject, selectedId = 0){
-    if (selectedId != 0) {
-        id = selectedId
-    }else{
-        id = selectedObject.options[selectedObject.selectedIndex].value;
-    }
+function getWoodDetails(selectedObject){
+    id = selectedObject.options[selectedObject.selectedIndex].value;
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function () {
@@ -77,10 +75,13 @@ function getWoodDetails(selectedObject, selectedId = 0){
         console.table(responseParsed);
         if (this.readyState == 4 && this.status == 200) {
             document.getElementById("nomBois").innerHTML = selectedObject.options[selectedObject.selectedIndex].text;
+            document.getElementById("nomBois2").innerHTML = selectedObject.options[selectedObject.selectedIndex].text;
             document.getElementById("typeBois").innerHTML = responseParsed.type;
             document.getElementById("origineBois").innerHTML = responseParsed.origine;
             document.getElementById("tempSechBois").innerHTML = responseParsed.drying + " secondes";
+            document.getElementById("tempSechBois2").innerHTML = responseParsed.drying;
             document.getElementById("tempMinBois").innerHTML = responseParsed.temp + " °C";
+            document.getElementById("tempMinBois2").innerHTML = responseParsed.temp + " °C";
         }
     }
 

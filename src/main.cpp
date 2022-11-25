@@ -56,12 +56,14 @@ const char *NOM_SYSTEME = "SAC System";
 const char *SSID = "TemperatureESP";
 const char *PASSWORD = "CodeSecret";
 
+float tempDeclenchement;
 
 DHT dht(DHTPIN, DHTTYPE);
 
 
 std::string CallBackMessageListener(std::string message) {
   const char * action = getValue(message, '|', 0).c_str();
+  const char * arg1 = getValue(message, '|', 1).c_str();
   /*
   if (strcmp(action, "GetWoodList") == 0) {
 
@@ -72,6 +74,15 @@ std::string CallBackMessageListener(std::string message) {
     char buffer[10];
     sprintf(buffer, "%g °C", t);
     return(buffer);
+  }
+
+
+  if(std::string(action).compare(std::string("setTemp")) == 0) {
+    try{
+      tempDeclenchement = std::stof(arg1);               //On convertit le string en float
+    }
+    catch (const std::invalid_argument&) { }             //Si la conversion échoue, on ne fait rien
+    return("");
   }
 }
 
