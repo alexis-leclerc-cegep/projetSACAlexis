@@ -1,17 +1,16 @@
 #include "MyOledViewWorkingOff.h"
 
 void MyOledViewWorkingOff::display( Adafruit_SSD1306 *adafruit) {
-    Serial.println("MyOledViewWorkingOff");
-    adafruit->setTextColor(WHITE);
 
-    adafruit->clearDisplay();
+    MyOledViewWorking::display(adafruit);
+
+    adafruit->setCursor(10, 30);
     adafruit->setTextSize(2);
-    adafruit->setCursor(0, 0);
-    //ajouter des choses
+    adafruit->print(getTag("temperature").c_str());
 
+    adafruit->setCursor(80, 20);
     adafruit->setTextSize(1);
-    adafruit->setCursor(0, 20);
-    adafruit->print("Working Off");
+    adafruit->print(getTag("statusDuSysteme").c_str());
 
     adafruit->display();
 }

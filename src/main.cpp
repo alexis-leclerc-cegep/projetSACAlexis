@@ -34,10 +34,15 @@
 #include <HTTPClient.h>
 #include <Wire.h>
 #include <WiFiManager.h>
+#include <WiFi.h>
 #include <MyOled.h>
 MyOled *myOled = NULL;
 #include <MyOledViewWifiAP.h>
 MyOledViewWifiAP *myOledViewWifiAP = NULL;
+#include <MyOledViewWorking.h>
+MyOledViewWorking *myOledViewWorking = NULL;
+#include <MyOledViewWorkingOff.h>
+MyOledViewWorkingOff *myOledViewWorkingOff = NULL;
 
 
 #include <string>
@@ -64,18 +69,13 @@ DHT dht(DHTPIN, DHTTYPE);
 std::string CallBackMessageListener(std::string message) {
   const char * action = getValue(message, '|', 0).c_str();
   const char * arg1 = getValue(message, '|', 1).c_str();
-  /*
-  if (strcmp(action, "GetWoodList") == 0) {
 
-  }
-  */
   if(std::string(action).compare(std::string("getTemp")) == 0) {
     float t = dht.readTemperature();
     char buffer[10];
     sprintf(buffer, "%g °C", t);
     return(buffer);
   }
-
 
   if(std::string(action).compare(std::string("setTemp")) == 0) {
     try{
@@ -99,10 +99,16 @@ void setup() {
   myOledViewWifiAP->setSSIDDuSysteme(SSID);
   myOledViewWifiAP->setPassDuSysteme(PASSWORD); 
   myOled->displayView(myOledViewWifiAP);
-  delay(3000);
 
   wm.autoConnect(SSID, PASSWORD);
 
+  myOledViewWorking = new MyOledViewWorking();
+
+  myOledViewWorking->setParams("nomSysteme", NOM_SYSTEME);
+  myOledViewWorking->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
+
+  myOledViewWorkingOff = new MyOledViewWorkingOff();
+  myOled->displayView(myOledViewWorkingOff);
 
   // ----------- Routes du serveur ----------------
   myServer = new MyServer(80);
