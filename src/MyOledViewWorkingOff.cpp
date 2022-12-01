@@ -10,7 +10,7 @@ void MyOledViewWorkingOff::display( Adafruit_SSD1306 *adafruit) {
 
     adafruit->setCursor(80, 20);
     adafruit->setTextSize(1);
-    adafruit->print(getTag("statusDuSysteme").c_str());
+    adafruit->print("Ready");
 
     adafruit->display();
 }

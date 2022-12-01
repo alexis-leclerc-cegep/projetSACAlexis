@@ -105,13 +105,7 @@ void setup() {
 
   wm.autoConnect(SSID, PASSWORD);
 
-  myOledViewWorking = new MyOledViewWorking();
-
-  myOledViewWorking->setParams("nomSysteme", NOM_SYSTEME);
-  myOledViewWorking->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
-
   myOledViewWorkingOff = new MyOledViewWorkingOff();
-  myOled->displayView(myOledViewWorkingOff);
 
   // ----------- Routes du serveur ----------------
   myServer = new MyServer(80);
@@ -124,8 +118,12 @@ void loop() {
 
   float t = dht.readTemperature();
   char buffer[10];
-  sprintf(buffer, "%g °C", t);
+  sprintf(buffer, "%g C", t);
+  Serial.println(buffer);
   myOledViewWorkingOff->setParams("temperature", buffer);
+  myOledViewWorkingOff->setParams("nomSysteme", NOM_SYSTEME);
+  myOledViewWorkingOff->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
+  myOled->displayView(myOledViewWorkingOff);
 
 /*
   if(t > tempDeclenchement) {
