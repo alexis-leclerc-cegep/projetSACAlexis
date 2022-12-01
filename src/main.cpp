@@ -68,9 +68,11 @@ DHT dht(DHTPIN, DHTTYPE);
 
 std::string CallBackMessageListener(std::string message) {
   const char * action = getValue(message, '|', 0).c_str();
-  const char * arg1 = getValue(message, '|', 1).c_str();
+
+  Serial.println(action);
 
   if(std::string(action).compare(std::string("getTemp")) == 0) {
+    Serial.println("la tempereature");
     float t = dht.readTemperature();
     char buffer[10];
     sprintf(buffer, "%g °C", t);
@@ -78,6 +80,7 @@ std::string CallBackMessageListener(std::string message) {
   }
 
   if(std::string(action).compare(std::string("setTemp")) == 0) {
+    const char * arg1 = getValue(message, '|', 1).c_str();
     try{
       tempDeclenchement = std::stof(arg1);               //On convertit le string en float
     }
@@ -117,5 +120,23 @@ void setup() {
 }
 
 void loop() {
+
+
+  float t = dht.readTemperature();
+  char buffer[10];
+  sprintf(buffer, "%g °C", t);
+  myOledViewWorkingOff->setParams("temperature", buffer);
+
+/*
+  if(t > tempDeclenchement) {
+    myOled->displayView(myOledViewWorking);
+  }
+
+  else {
+    */
+
+//  }
+
+  delay(1000);
 
 }
