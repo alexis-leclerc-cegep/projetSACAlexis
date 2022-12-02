@@ -74,6 +74,8 @@ function getWoodDetails(selectedObject){
         const responseParsed = JSON.parse(this.responseText.slice(1, -1));
         console.table(responseParsed);
         if (this.readyState == 4 && this.status == 200) {
+            setWoodTemperature(responseParsed.temperature);
+            setWoodTemps(responseParsed.temps);
             document.getElementById("nomBois").innerHTML = selectedObject.options[selectedObject.selectedIndex].text;
             document.getElementById("nomBois2").innerHTML = selectedObject.options[selectedObject.selectedIndex].text;
             document.getElementById("typeBois").innerHTML = responseParsed.type;
@@ -90,6 +92,17 @@ function getWoodDetails(selectedObject){
 
 }
 
+function setWoodTemperature(temperature) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "setWoodTemperature?temperature=" + temperature, true);	
+    xhttp.send();
+}
+
+function setWoodTemps(temps) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "setWoodTemps?temps=" + temps, true);	
+    xhttp.send();
+}
 /*
 getBois().then(data => {
     let option;

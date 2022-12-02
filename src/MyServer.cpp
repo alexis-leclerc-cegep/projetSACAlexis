@@ -39,14 +39,29 @@ void MyServer::initAllRoutes() {
         request->send(SPIFFS, "/script.js", "text/javascript");
         });
 
-    this->on("/setTemp", HTTP_GET, [](AsyncWebServerRequest *request) {
+    
+
+    this->on("/setWoodTemperature", HTTP_GET, [](AsyncWebServerRequest *request) {
         if(request->hasParam("temp")){
             request->send(200, "text/plain",  "Temperature changed");
-            String action = "SetTemp" ;
+            String action = "setWoodTemperature" ;
 
             char buffer[40];
 
             String inputTemp = request->getParam("temp")->value();
+            sprintf(buffer, "%s|%s", action.c_str(), inputTemp.c_str());
+            if(ptrToCallBackFunction)(*ptrToCallBackFunction)(buffer);
+        }
+    });
+
+    this->on("setWoodTemps", HTTP_GET, [](AsyncWebServerRequest *request) {
+        if(request->hasParam("temps")){
+            request->send(200, "text/plain",  "Temperature changed");
+            String action = "setWoodTemps" ;
+
+            char buffer[40];
+
+            String inputTemp = request->getParam("temps")->value();
             sprintf(buffer, "%s|%s", action.c_str(), inputTemp.c_str());
             if(ptrToCallBackFunction)(*ptrToCallBackFunction)(buffer);
         }

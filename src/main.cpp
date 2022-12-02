@@ -60,8 +60,12 @@ MyServer *myServer = NULL;
 const char *NOM_SYSTEME = "SAC System";
 const char *SSID = "TemperatureESP";
 const char *PASSWORD = "CodeSecret";
+const char *ID_SYSTEME = "696969";
 
 float tempDeclenchement;
+float secondesSechage = 0;
+
+int timer = 0;
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -79,10 +83,21 @@ std::string CallBackMessageListener(std::string message) {
     return(buffer);
   }
 
-  if(std::string(action).compare(std::string("setTemp")) == 0) {
+  if(std::string(action).compare(std::string("setWoodTemperature")) == 0) {
     const char * arg1 = getValue(message, '|', 1).c_str();
+    Serial.println(arg1);
     try{
       tempDeclenchement = std::stof(arg1);               //On convertit le string en float
+    }
+    catch (const std::invalid_argument&) { }             //Si la conversion échoue, on ne fait rien
+    return("");
+  }
+
+  if(std::string(action).compare(std::string("setWoodTemps")) == 0) {
+    const char * arg1 = getValue(message, '|', 1).c_str();
+    Serial.println(arg1);
+    try{
+      secondesSechage = std::stoi(arg1);               //On convertit le string en float
     }
     catch (const std::invalid_argument&) { }             //Si la conversion échoue, on ne fait rien
     return("");
@@ -115,15 +130,18 @@ void setup() {
 
 void loop() {
 
+  if(timer % 1000 == 0){
+    float t = dht.readTemperature();
+    char buffer[10];
+    sprintf(buffer, "%g C", t);
+    Serial.println(buffer);
+    myOledViewWorkingOff->setParams("temperature", buffer);
+    myOledViewWorkingOff->setParams("nomSysteme", NOM_SYSTEME);
+    myOledViewWorkingOff->setParams("idSysteme", ID_SYSTEME);
+    myOledViewWorkingOff->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
+    myOled->displayView(myOledViewWorkingOff);
+  }
 
-  float t = dht.readTemperature();
-  char buffer[10];
-  sprintf(buffer, "%g C", t);
-  Serial.println(buffer);
-  myOledViewWorkingOff->setParams("temperature", buffer);
-  myOledViewWorkingOff->setParams("nomSysteme", NOM_SYSTEME);
-  myOledViewWorkingOff->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
-  myOled->displayView(myOledViewWorkingOff);
 
 /*
   if(t > tempDeclenchement) {
@@ -135,6 +153,7 @@ void loop() {
 
 //  }
 
-  delay(1000);
+  timer += 10;
+  delay(10);
 
 }
