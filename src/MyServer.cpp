@@ -52,6 +52,9 @@ void MyServer::initAllRoutes() {
             sprintf(buffer, "%s|%s", action.c_str(), inputTemp.c_str());
             if(ptrToCallBackFunction)(*ptrToCallBackFunction)(buffer);
         }
+        else{
+            request->send(400, "text/plain", "Temperature not changed");
+        }
     });
 
     this->on("setWoodTemps", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -64,6 +67,9 @@ void MyServer::initAllRoutes() {
             String inputTemp = request->getParam("temps")->value();
             sprintf(buffer, "%s|%s", action.c_str(), inputTemp.c_str());
             if(ptrToCallBackFunction)(*ptrToCallBackFunction)(buffer);
+        }
+        else{
+            request->send(400, "text/plain", "Temps de séchage not changed");
         }
     });
 
