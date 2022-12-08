@@ -43,6 +43,10 @@ MyOledViewWifiAP *myOledViewWifiAP = NULL;
 MyOledViewWorking *myOledViewWorking = NULL;
 #include <MyOledViewWorkingOff.h>
 MyOledViewWorkingOff *myOledViewWorkingOff = NULL;
+#include <MyOledViewWorkingHeat.h>
+MyOledViewWorkingHeat *myOledViewWorkingHeat = NULL;
+#include <MyOledViewWorkingCold.h>
+MyOledViewWorkingCold *myOledViewWorkingCold = NULL;
 
 
 #include <string>
@@ -62,10 +66,18 @@ const char *SSID = "TemperatureESP";
 const char *PASSWORD = "CodeSecret";
 const char *ID_SYSTEME = "696969";
 
+const int GPIO_PIN_LED_OK_GREEN = 14;
+const int GPIO_PIN_LED_LOCK_RED = 12;
+const int GPIO_PIN_LED_Heat_YELLOW = 27;
+
 float tempDeclenchement;
 float secondesSechage = 0;
+float currentTemp;
 
 int timer = 0;
+int currentTempFour = 0;
+
+char * strTemperature;
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -104,6 +116,53 @@ std::string CallBackMessageListener(std::string message) {
   }
 }
 
+void displayGoodScreen(){
+
+  sprintf(strTemperature, "%2.2f", currentTemp);
+
+  if(isEqualString(etat.c_str(), string("Heat"))) myOled->updateCurrentView(myOledViewWorkingHeat);
+
+  if(isEqualString(etat.c_str(), string("Off"))) {
+    digitalWrite(GPIO_PIN_LED_LOCK_RED, LOW);
+    digitalWrite(GPIO_PIN_LED_OK_GREEN, HIGH);
+    digitalWrite(GPIO_PIN_LED_Heat_YELLOW, LOW);
+    myOledViewWorkingOff = new MyOledViewWorkingOff();
+    myOledViewWorkingOff->setParams("NOM_SYSTEME", NOM_SYSTEME);
+    myOledViewWorkingOff->setParams("ID_SYSTEME", ID_SYSTEME);
+    myOledViewWorkingOff->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
+    myOledViewWorkingOff->setParams("temperature", strTemperature);
+    myOled->displayView(myOledViewWorkingOff);
+    currentTempFour = currentTemp;
+  }
+
+  if(isEqualString(etat.c_str(), string("Cold"))) {
+    digitalWrite(GPIO_PIN_LED_LOCK_RED, LOW);
+    digitalWrite(GPIO_PIN_LED_OK_GREEN, LOW);
+    digitalWrite(GPIO_PIN_LED_Heat_YELLOW, HIGH);
+    myOledViewWorkingCold = new MyOledViewWorkingCold();
+    myOledViewWorkingCold->setParams("NOM_SYSTEME", NOM_SYSTEME);
+    myOledViewWorkingCold->setParams("ID_SYSTEME", ID_SYSTEME);
+    myOledViewWorkingCold->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
+    myOledViewWorkingCold->setParams("temperature", strTemperature);
+    myOled->displayView(myOledViewWorkingCold);
+    currentTempFour = currentTemp;
+  }
+
+  if(isEqualString(etat.c_str(), string("Heat"))) {
+    digitalWrite(GPIO_PIN_LED_LOCK_RED, HIGH);
+    digitalWrite(GPIO_PIN_LED_OK_GREEN, LOW);
+    digitalWrite(GPIO_PIN_LED_Heat_YELLOW, LOW);
+
+    myOledViewWorkingHeat = new MyOledViewWorkingHeat();
+    myOledViewWorkingHeat->setParams("NOM_SYSTEME", NOM_SYSTEME);
+    myOledViewWorkingHeat->setParams("ID_SYSTEME", ID_SYSTEME);
+    myOledViewWorkingHeat->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
+    myOledViewWorkingHeat->setParams("temperature", strTemperature);
+    myOled->displayView(myOledViewWorkingHeat);
+    currentTempFour = currentTemp;
+  }
+}
+
 void setup() {
   WiFi.disconnect();
   Serial.begin(115200);
@@ -131,15 +190,9 @@ void setup() {
 void loop() {
 
   if(timer % 1000 == 0){
-    float t = dht.readTemperature();
-    char buffer[10];
-    sprintf(buffer, "%g C", t);
-    Serial.println(buffer);
-    myOledViewWorkingOff->setParams("temperature", buffer);
-    myOledViewWorkingOff->setParams("nomSysteme", NOM_SYSTEME);
-    myOledViewWorkingOff->setParams("idSysteme", ID_SYSTEME);
-    myOledViewWorkingOff->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
-    myOled->displayView(myOledViewWorkingOff);
+    float currentTemp = dht.readTemperature();
+
+    displayGoodScreen();
   }
 
 
