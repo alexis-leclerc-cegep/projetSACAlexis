@@ -57,6 +57,12 @@ void MyServer::initAllRoutes() {
         }
     });
 
+    this->on("/startFour", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(200, "text/plain",  "Procédure de déclenchement engagée");
+        String action = "startFour" ;
+        if(ptrToCallBackFunction)(*ptrToCallBackFunction)(action.c_str());
+    });
+
     this->on("/setWoodTemps", HTTP_GET, [](AsyncWebServerRequest *request) {
         Serial.println("Dans la route /setWoodTemps");
         if(request->hasParam("temps")){

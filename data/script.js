@@ -103,6 +103,13 @@ function setWoodTemps(temps) {
     xhttp.open("GET", "setWoodTemps?temps=" + temps, true);	
     xhttp.send();
 }
+
+function startFour() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "startFour", true);
+    xhttp.send();
+}
+
 /*
 getBois().then(data => {
     let option;
