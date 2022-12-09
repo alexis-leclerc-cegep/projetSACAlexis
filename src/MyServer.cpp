@@ -34,6 +34,14 @@ void MyServer::initAllRoutes() {
         request->send(SPIFFS, "/index.html", "text/html");
         });
 
+    this->on("/sac.png", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(SPIFFS, "/sac.png", "image/png");
+        });
+
+    this->on("/test", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->send(200, "text/plain",  "Test");
+        });
+
     //Route du script JavaScript
     this->on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/script.js", "text/javascript");
@@ -59,8 +67,8 @@ void MyServer::initAllRoutes() {
 
     this->on("/startFour", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(200, "text/plain",  "Procédure de déclenchement engagée");
-        String action = "startFour" ;
-        if(ptrToCallBackFunction)(*ptrToCallBackFunction)(action.c_str());
+        char buffer[40] = "startFour";
+        if(ptrToCallBackFunction)(*ptrToCallBackFunction)(buffer);
     });
 
     this->on("/setWoodTemps", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -82,7 +90,8 @@ void MyServer::initAllRoutes() {
 
     this->on("/lireTemp", HTTP_GET, [](AsyncWebServerRequest *request) {
         std::string repString = "";
-        if (ptrToCallBackFunction) repString = (*ptrToCallBackFunction)("getTemp");
+        char buffer[10] = "getTemp";
+        if (ptrToCallBackFunction) repString = (*ptrToCallBackFunction)(buffer);
         request->send(200, "text/plain", repString.c_str());
     });
 

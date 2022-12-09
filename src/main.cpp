@@ -90,12 +90,21 @@ using namespace std;
 
 std::string CallBackMessageListener(std::string message) {
   const char * action = getValue(message, '|', 0).c_str();
+  Serial.println(action);
+
+  if(std::string(action).compare(std::string("startFour")) == 0) {
+    buttonPressed = true;
+    Serial.println("the button was perssed");
+    return("");
+  }
 
   if(std::string(action).compare(std::string("getTemp")) == 0) {
+    Serial.println("je suis dans ge ttemperaturee");
     char buffer[10];
     sprintf(buffer, "%g °C", currentTemp);
     return(buffer);
   }
+
 
   if(std::string(action).compare(std::string("setWoodTemperature")) == 0) {
     const char * arg1 = getValue(message, '|', 1).c_str();
@@ -107,11 +116,6 @@ std::string CallBackMessageListener(std::string message) {
     return("");
   }
 
-  if(std::string(action).compare(std::string("startFour")) == 0) {
-    buttonPressed = true;
-    Serial.println("the button was perssed");
-    return("");
-  }
 
   if(std::string(action).compare(std::string("setWoodTemps")) == 0) {
     const char * arg1 = getValue(message, '|', 1).c_str();
@@ -206,7 +210,6 @@ void loop() {
 
     if (!buttonPressed)
     {
-      Serial.println("button not pressed");
       etat = "OFF";
     }
     else 
@@ -218,7 +221,7 @@ void loop() {
       else if (currentTemp > tempDeclenchement*0.90 && currentTemp <= tempDeclenchement*1.10)
       {
         etat = "HEAT";
-        while (timer<secondesSechage && (currentTemp >= tempDeclenchement*0.90 && currentTemp <= tempDeclenchement*1.10))
+        while (timerSechage<secondesSechage&& (currentTemp >= tempDeclenchement*0.90 && currentTemp <= tempDeclenchement*1.10))
         {
           // On incrémente le compteur
           timerSechage++;
