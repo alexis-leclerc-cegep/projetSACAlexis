@@ -74,10 +74,13 @@ float tempDeclenchement;
 float secondesSechage = 0;
 float currentTemp;
 
+bool buttonPressed = false;
+
 int timer = 0;
 int currentTempFour = 0;
 
-char * strTemperature;
+char etat[10];
+char strTemperature[10];
 
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -89,7 +92,7 @@ std::string CallBackMessageListener(std::string message) {
 
   if(std::string(action).compare(std::string("getTemp")) == 0) {
     Serial.println("la tempereature");
-    float t = dht.readTemperature();
+    float t = currentTemp;
     char buffer[10];
     sprintf(buffer, "%g °C", t);
     return(buffer);
@@ -116,13 +119,13 @@ std::string CallBackMessageListener(std::string message) {
   }
 }
 
-void displayGoodScreen(){
+void displayGoodScreen(std::string etat , float currentTemp) {
 
   sprintf(strTemperature, "%2.2f", currentTemp);
 
-  if(isEqualString(etat.c_str(), string("Heat"))) myOled->updateCurrentView(myOledViewWorkingHeat);
+  if(isEqualString(etat.c_str(), std::string("Heat"))) myOled->updateCurrentView(myOledViewWorkingHeat);
 
-  if(isEqualString(etat.c_str(), string("Off"))) {
+  if(isEqualString(etat.c_str(), std::string("Off"))) {
     digitalWrite(GPIO_PIN_LED_LOCK_RED, LOW);
     digitalWrite(GPIO_PIN_LED_OK_GREEN, HIGH);
     digitalWrite(GPIO_PIN_LED_Heat_YELLOW, LOW);
@@ -135,7 +138,7 @@ void displayGoodScreen(){
     currentTempFour = currentTemp;
   }
 
-  if(isEqualString(etat.c_str(), string("Cold"))) {
+  if(isEqualString(etat.c_str(), std::string("Cold"))) {
     digitalWrite(GPIO_PIN_LED_LOCK_RED, LOW);
     digitalWrite(GPIO_PIN_LED_OK_GREEN, LOW);
     digitalWrite(GPIO_PIN_LED_Heat_YELLOW, HIGH);
@@ -148,7 +151,7 @@ void displayGoodScreen(){
     currentTempFour = currentTemp;
   }
 
-  if(isEqualString(etat.c_str(), string("Heat"))) {
+  if(isEqualString(etat.c_str(), std::string("Heat"))) {
     digitalWrite(GPIO_PIN_LED_LOCK_RED, HIGH);
     digitalWrite(GPIO_PIN_LED_OK_GREEN, LOW);
     digitalWrite(GPIO_PIN_LED_Heat_YELLOW, LOW);
@@ -190,23 +193,20 @@ void setup() {
 void loop() {
 
   if(timer % 1000 == 0){
+    if(buttonPressed){
+      
+      if (currentTemp <= tempDeclenchement) {
+        strcpy(etat, "Cold");
+      }else if(currentTemp > tempDeclenchement * 0.9 && currentTemp < tempDeclenchement * 1.1){
+        strcpy(etat, "Heat");
+      }
+      displayGoodScreen(etat, currentTemp);
+
+    }
     float currentTemp = dht.readTemperature();
 
-    displayGoodScreen();
   }
-
-
-/*
-  if(t > tempDeclenchement) {
-    myOled->displayView(myOledViewWorking);
-  }
-
-  else {
-    */
-
-//  }
 
   timer += 10;
   delay(10);
-
 }
