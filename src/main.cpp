@@ -48,6 +48,8 @@ MyOledViewWorkingHeat *myOledViewWorkingHeat = NULL;
 #include <MyOledViewWorkingCold.h>
 MyOledViewWorkingCold *myOledViewWorkingCold = NULL;
 
+#define DHTPIN 4
+#define DHTTYPE DHT22                                       //On définit le type de DHT comme étant un DHT22  
 
 #include <string>
 
@@ -58,8 +60,6 @@ WiFiManager wm;
 #include "MyServer.h"
 MyServer *myServer = NULL;
 
-#define DHTPIN 4
-#define DHTTYPE DHT22                                       //On définit le type de DHT comme étant un DHT22  
 
 const char *NOM_SYSTEME = "SAC System";
 const char *SSID = "TemperatureESP";
@@ -72,29 +72,26 @@ const int GPIO_PIN_LED_Heat_YELLOW = 27;
 
 float tempDeclenchement;
 float secondesSechage = 0;
-float currentTemp;
+float currentTemp = 0;
 
 bool buttonPressed = false;
 
 int timer = 0;
-int currentTempFour = 0;
+int tempFour= 0;
 
 char etat[10];
 char strTemperature[10];
 
 DHT dht(DHTPIN, DHTTYPE);
 
+using namespace std;
 
 std::string CallBackMessageListener(std::string message) {
   const char * action = getValue(message, '|', 0).c_str();
 
-  Serial.println(action);
-
   if(std::string(action).compare(std::string("getTemp")) == 0) {
-    Serial.println("la tempereature");
-    float t = currentTemp;
     char buffer[10];
-    sprintf(buffer, "%g °C", t);
+    sprintf(buffer, "%g °C", currentTemp);
     return(buffer);
   }
 
@@ -102,7 +99,7 @@ std::string CallBackMessageListener(std::string message) {
     const char * arg1 = getValue(message, '|', 1).c_str();
     Serial.println(arg1);
     try{
-      tempDeclenchement = std::stof(arg1);               //On convertit le string en float
+      tempDeclenchement = stof(arg1);               //On convertit le string en float
     }
     catch (const std::invalid_argument&) { }             //Si la conversion échoue, on ne fait rien
     return("");
@@ -112,16 +109,16 @@ std::string CallBackMessageListener(std::string message) {
     const char * arg1 = getValue(message, '|', 1).c_str();
     Serial.println(arg1);
     try{
-      secondesSechage = std::stoi(arg1);               //On convertit le string en float
+      secondesSechage = stoi(arg1);               //On convertit le string en float
     }
     catch (const std::invalid_argument&) { }             //Si la conversion échoue, on ne fait rien
     return("");
   }
 }
 
-void displayGoodScreen(std::string etat , float currentTemp) {
+void displayGoodScreen(std::string etat , float temp) {
 
-  sprintf(strTemperature, "%2.2f", currentTemp);
+  sprintf(strTemperature, "%2.2f", temp);
 
   if(isEqualString(etat.c_str(), std::string("Heat"))) myOled->updateCurrentView(myOledViewWorkingHeat);
 
@@ -135,7 +132,7 @@ void displayGoodScreen(std::string etat , float currentTemp) {
     myOledViewWorkingOff->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
     myOledViewWorkingOff->setParams("temperature", strTemperature);
     myOled->displayView(myOledViewWorkingOff);
-    currentTempFour = currentTemp;
+    tempFour = temp;
   }
 
   if(isEqualString(etat.c_str(), std::string("Cold"))) {
@@ -148,7 +145,7 @@ void displayGoodScreen(std::string etat , float currentTemp) {
     myOledViewWorkingCold->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
     myOledViewWorkingCold->setParams("temperature", strTemperature);
     myOled->displayView(myOledViewWorkingCold);
-    currentTempFour = currentTemp;
+    tempFour = temp;
   }
 
   if(isEqualString(etat.c_str(), std::string("Heat"))) {
@@ -162,11 +159,13 @@ void displayGoodScreen(std::string etat , float currentTemp) {
     myOledViewWorkingHeat->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
     myOledViewWorkingHeat->setParams("temperature", strTemperature);
     myOled->displayView(myOledViewWorkingHeat);
-    currentTempFour = currentTemp;
+    tempFour = temp;
   }
 }
 
 void setup() {
+  dht.begin();
+
   WiFi.disconnect();
   Serial.begin(115200);
   Serial.println("dans le nouveau programme");
@@ -193,6 +192,7 @@ void setup() {
 void loop() {
 
   if(timer % 1000 == 0){
+    /*
     if(buttonPressed){
       
       if (currentTemp <= tempDeclenchement) {
@@ -203,7 +203,12 @@ void loop() {
       displayGoodScreen(etat, currentTemp);
 
     }
-    float currentTemp = dht.readTemperature();
+    */
+    currentTemp = dht.readTemperature();
+    char buffer2[10];
+    sprintf(buffer2, "%g °C", currentTemp);
+    Serial.println(buffer2);
+
 
   }
 

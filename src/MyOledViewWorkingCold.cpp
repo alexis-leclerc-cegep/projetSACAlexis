@@ -9,11 +9,11 @@
 
 using namespace std;
 
-void MyOledViewWorkingCOLD::update(Adafruit_SSD1306 *adafruit){
+void MyOledViewWorkingCold::update(Adafruit_SSD1306 *adafruit){
     Serial.println("Update my view MyOledViewWorking");
     }
 
-void MyOledViewWorkingCOLD::display( Adafruit_SSD1306 *adafruit) {
+void MyOledViewWorkingCold::display( Adafruit_SSD1306 *adafruit) {
 
     MyOledViewWorking::display(adafruit);
 

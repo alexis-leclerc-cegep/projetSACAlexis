@@ -57,7 +57,8 @@ void MyServer::initAllRoutes() {
         }
     });
 
-    this->on("setWoodTemps", HTTP_GET, [](AsyncWebServerRequest *request) {
+    this->on("/setWoodTemps", HTTP_GET, [](AsyncWebServerRequest *request) {
+        Serial.println("Dans la route /setWoodTemps");
         if(request->hasParam("temps")){
             request->send(200, "text/plain",  "Temperature changed");
             String action = "setWoodTemps" ;
