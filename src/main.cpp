@@ -10,10 +10,15 @@
  * @brief    Programme qui allume la led à une température définie
  * 
  * Historique des versions:
- *  - Version : 1.0 
+ *  - Version :  0.1
  *  - Date : 10/27/22
  *  - Auteur : Alexis Leclerc
  *  - Description : Première version du logiciel
+ *
+ *  - Version : 1.0 
+ *  - Date : 12/09/22
+ *  - Auteur : Alexis Leclerc
+ *  - Description : Première version fonctionnelle du logiciel
  * 
  * Contenu du fichier platformio.ini:
  * 
@@ -23,8 +28,12 @@
  *  framework = arduino
  *  monitor_speed = 115200
  *  lib_deps = 
- *  	adafruit/Adafruit Unified Sensor@^1.1.6
- *  	adafruit/DHT sensor library@^1.4.4
+ *     ESPAsyncWebServer-esphome
+ *     AsyncTCP-esphome
+ *     adafruit/Adafruit Unified Sensor@^1.1.6
+ *     adafruit/Adafruit SSD1306@^2.5.7
+ *     adafruit/DHT sensor library@^1.4.4
+ *     bblanchon/ArduinoJson@^6.19.4
  * 
  */
 
