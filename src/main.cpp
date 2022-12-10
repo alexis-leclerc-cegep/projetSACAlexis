@@ -30,7 +30,6 @@
 
 #include <Arduino.h>                                        //Le framework Arduino
 #include "MyFunctions.cpp"
-#include "DHT.h"                                            //Inclure la librairie pour intéragir avec le DHT22
 #include <HTTPClient.h>
 #include <Wire.h>
 #include <WiFiManager.h>
@@ -48,8 +47,9 @@ MyOledViewWorkingHeat *myOledViewWorkingHeat = NULL;
 #include <MyOledViewWorkingCold.h>
 MyOledViewWorkingCold *myOledViewWorkingCold = NULL;
 
-#define DHTPIN 4
-#define DHTTYPE DHT22                                       //On définit le type de DHT comme étant un DHT22  
+#include <TemperatureStub.h>
+TemperatureStub *temperatureStub = NULL;
+
 
 #include <string>
 
@@ -84,7 +84,6 @@ std::string etat = "OFF";
 char strTemperature[10];
 char strTimer[10];
 
-DHT dht(DHTPIN, DHTTYPE);
 
 using namespace std;
 
@@ -92,12 +91,10 @@ std::string CallBackMessageListener(std::string message) {
 
   if(std::string(getValue(message, '|', 0).c_str()).compare(std::string("startFour")) == 0) { //Je sais j'aurais du prendre une variable pour action, mais ça ne marche pas sinon
     buttonPressed = true;
-    Serial.println("the button was perssed");
     return("");
   }
 
   if(std::string(getValue(message, '|', 0).c_str()).compare(std::string("getTemp")) == 0) {
-    Serial.println("je suis dans ge ttemperaturee");
     char buffer[10];
     sprintf(buffer, "%g °C|%i", currentTemp, timerSechage);
     return(buffer);
@@ -105,7 +102,6 @@ std::string CallBackMessageListener(std::string message) {
 
   if(std::string(getValue(message, '|', 0).c_str()).compare(std::string("setWoodTemperature")) == 0) {
     const char * arg1 = getValue(message, '|', 1).c_str();
-    Serial.println(arg1);
     try{
       tempDeclenchement = stof(arg1);               //On convertit le string en float
     }
@@ -117,7 +113,6 @@ std::string CallBackMessageListener(std::string message) {
 
   if(std::string(getValue(message, '|', 0).c_str()).compare(std::string("setWoodTemps")) == 0) {
     const char * arg1 = getValue(message, '|', 1).c_str();
-    Serial.println(arg1);
     try{
       secondesSechage = stoi(arg1);               //On convertit le string en entier
     }
@@ -133,7 +128,6 @@ void displayGoodScreen(std::string etat , float temp, int timer) {
   sprintf(strTemperature, "%2.2f", temp);
   sprintf(strTimer, "%d", timer);
 
-  Serial.println(etat.c_str());
 
   if(isEqualString(etat.c_str(), std::string("HEAT"))) myOled->updateCurrentView(myOledViewWorkingHeat);
 
@@ -142,8 +136,8 @@ void displayGoodScreen(std::string etat , float temp, int timer) {
     digitalWrite(GPIO_PIN_LED_OK_GREEN, HIGH);
     digitalWrite(GPIO_PIN_LED_Heat_YELLOW, LOW);
     myOledViewWorkingOff = new MyOledViewWorkingOff();
-    myOledViewWorkingOff->setParams("NOM_SYSTEME", NOM_SYSTEME);
-    myOledViewWorkingOff->setParams("ID_SYSTEME", ID_SYSTEME);
+    myOledViewWorkingOff->setParams("nomDuSysteme", NOM_SYSTEME);
+    myOledViewWorkingOff->setParams("idDuSysteme", ID_SYSTEME);
     myOledViewWorkingOff->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
     myOledViewWorkingOff->setParams("temperature", strTemperature);
     myOled->displayView(myOledViewWorkingOff);
@@ -155,8 +149,8 @@ void displayGoodScreen(std::string etat , float temp, int timer) {
     digitalWrite(GPIO_PIN_LED_OK_GREEN, LOW);
     digitalWrite(GPIO_PIN_LED_Heat_YELLOW, HIGH);
     myOledViewWorkingCold = new MyOledViewWorkingCold();
-    myOledViewWorkingCold->setParams("NOM_SYSTEME", NOM_SYSTEME);
-    myOledViewWorkingCold->setParams("ID_SYSTEME", ID_SYSTEME);
+    myOledViewWorkingCold->setParams("nomDuSysteme", NOM_SYSTEME);
+    myOledViewWorkingCold->setParams("idDuSysteme", ID_SYSTEME);
     myOledViewWorkingCold->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
     myOledViewWorkingCold->setParams("temperature", strTemperature);
     myOled->displayView(myOledViewWorkingCold);
@@ -169,8 +163,8 @@ void displayGoodScreen(std::string etat , float temp, int timer) {
     digitalWrite(GPIO_PIN_LED_Heat_YELLOW, LOW);
 
     myOledViewWorkingHeat = new MyOledViewWorkingHeat();
-    myOledViewWorkingHeat->setParams("NOM_SYSTEME", NOM_SYSTEME);
-    myOledViewWorkingHeat->setParams("ID_SYSTEME", ID_SYSTEME);
+    myOledViewWorkingHeat->setParams("nomDuSysteme", NOM_SYSTEME);
+    myOledViewWorkingHeat->setParams("idDuSysteme", ID_SYSTEME);
     myOledViewWorkingHeat->setParams("ipDuSysteme", WiFi.localIP().toString().c_str());
     myOledViewWorkingHeat->setParams("temperature", strTemperature);
     myOled->displayView(myOledViewWorkingHeat);
@@ -179,7 +173,6 @@ void displayGoodScreen(std::string etat , float temp, int timer) {
 }
 
 void setup() {
-  dht.begin();
 
   WiFi.disconnect();
 
@@ -188,7 +181,10 @@ void setup() {
   pinMode(GPIO_PIN_LED_Heat_YELLOW, OUTPUT);
 
   Serial.begin(115200);
-  Serial.println("dans le nouveau programme");
+
+  temperatureStub = new TemperatureStub();
+  temperatureStub->init();
+
   myOled = new MyOled(&Wire, -1, 64, 128);
   myOled->init();
 
@@ -227,7 +223,7 @@ void setup() {
 void loop() {
 
   if(timer % 1000 == 0){
-    currentTemp = dht.readTemperature();
+    currentTemp = temperatureStub->getTemperature();
 
     if (!buttonPressed)
     {
