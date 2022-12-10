@@ -99,7 +99,7 @@ std::string CallBackMessageListener(std::string message) {
   if(std::string(getValue(message, '|', 0).c_str()).compare(std::string("getTemp")) == 0) {
     Serial.println("je suis dans ge ttemperaturee");
     char buffer[10];
-    sprintf(buffer, "%g °C", currentTemp);
+    sprintf(buffer, "%g °C|%i", currentTemp, timerSechage);
     return(buffer);
   }
 

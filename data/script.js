@@ -15,12 +15,13 @@ setInterval(function getTemperature(){
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if(this.status == 200) {
-        document.getElementById("temp").innerHTML = this.responseText;
+        document.getElementById("temp").innerHTML = this.responseText.split('|')[0];
+        document.getElementById("timer").innerHTML = this.responseText.split('|')[1];
         }
     };
     xhttp.open("GET", "lireTemp", true);
     xhttp.send();
-   }, 5000);
+   }, 1000);
 
 // function doAction(actionToDo) {
 //     var params = String("actionToDo") + String("=") + String(actionToDo);
