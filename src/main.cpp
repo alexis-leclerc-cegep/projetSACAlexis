@@ -66,9 +66,9 @@ const char *SSID = "TemperatureESP";
 const char *PASSWORD = "CodeSecret";
 const char *ID_SYSTEME = "696969";
 
-const int GPIO_PIN_LED_OK_GREEN = 14;
-const int GPIO_PIN_LED_LOCK_RED = 12;
 const int GPIO_PIN_LED_Heat_YELLOW = 27;
+const int GPIO_PIN_LED_LOCK_RED = 12;
+const int GPIO_PIN_LED_OK_GREEN = 14;
 
 float tempDeclenchement;
 float secondesSechage = 0;
@@ -89,24 +89,21 @@ DHT dht(DHTPIN, DHTTYPE);
 using namespace std;
 
 std::string CallBackMessageListener(std::string message) {
-  const char * action = getValue(message, '|', 0).c_str();
-  Serial.println(action);
 
-  if(std::string(action).compare(std::string("startFour")) == 0) {
+  if(std::string(getValue(message, '|', 0).c_str()).compare(std::string("startFour")) == 0) { //Je sais j'aurais du prendre une variable pour action, mais ça ne marche pas sinon
     buttonPressed = true;
     Serial.println("the button was perssed");
     return("");
   }
 
-  if(std::string(action).compare(std::string("getTemp")) == 0) {
+  if(std::string(getValue(message, '|', 0).c_str()).compare(std::string("getTemp")) == 0) {
     Serial.println("je suis dans ge ttemperaturee");
     char buffer[10];
     sprintf(buffer, "%g °C", currentTemp);
     return(buffer);
   }
 
-
-  if(std::string(action).compare(std::string("setWoodTemperature")) == 0) {
+  if(std::string(getValue(message, '|', 0).c_str()).compare(std::string("setWoodTemperature")) == 0) {
     const char * arg1 = getValue(message, '|', 1).c_str();
     Serial.println(arg1);
     try{
@@ -117,21 +114,26 @@ std::string CallBackMessageListener(std::string message) {
   }
 
 
-  if(std::string(action).compare(std::string("setWoodTemps")) == 0) {
+
+  if(std::string(getValue(message, '|', 0).c_str()).compare(std::string("setWoodTemps")) == 0) {
     const char * arg1 = getValue(message, '|', 1).c_str();
     Serial.println(arg1);
     try{
-      secondesSechage = stoi(arg1);               //On convertit le string en float
+      secondesSechage = stoi(arg1);               //On convertit le string en entier
     }
     catch (const std::invalid_argument&) { }             //Si la conversion échoue, on ne fait rien
     return("");
   }
+
+  return("");
 }
 
 void displayGoodScreen(std::string etat , float temp, int timer) {
 
   sprintf(strTemperature, "%2.2f", temp);
   sprintf(strTimer, "%d", timer);
+
+  Serial.println(etat.c_str());
 
   if(isEqualString(etat.c_str(), std::string("HEAT"))) myOled->updateCurrentView(myOledViewWorkingHeat);
 
@@ -180,6 +182,11 @@ void setup() {
   dht.begin();
 
   WiFi.disconnect();
+
+  pinMode(GPIO_PIN_LED_LOCK_RED, OUTPUT);
+  pinMode(GPIO_PIN_LED_OK_GREEN, OUTPUT);
+  pinMode(GPIO_PIN_LED_Heat_YELLOW, OUTPUT);
+
   Serial.begin(115200);
   Serial.println("dans le nouveau programme");
   myOled = new MyOled(&Wire, -1, 64, 128);
@@ -194,6 +201,20 @@ void setup() {
 
   wm.autoConnect(SSID, PASSWORD);
 
+  //make it run two times
+  for(int i=0; i<2; i++){
+    digitalWrite(GPIO_PIN_LED_LOCK_RED, HIGH);
+    digitalWrite(GPIO_PIN_LED_OK_GREEN, HIGH);
+    digitalWrite(GPIO_PIN_LED_Heat_YELLOW, HIGH);
+
+    delay(500);
+
+    digitalWrite(GPIO_PIN_LED_LOCK_RED, LOW);
+    digitalWrite(GPIO_PIN_LED_OK_GREEN, LOW);
+    digitalWrite(GPIO_PIN_LED_Heat_YELLOW, LOW);
+
+    delay(500);
+  }
 
   // ----------- Routes du serveur ----------------
   myServer = new MyServer(80);
@@ -220,24 +241,18 @@ void loop() {
       }
       else if (currentTemp > tempDeclenchement*0.90 && currentTemp <= tempDeclenchement*1.10)
       {
-        etat = "HEAT";
-        while (timerSechage<secondesSechage&& (currentTemp >= tempDeclenchement*0.90 && currentTemp <= tempDeclenchement*1.10))
-        {
+        if (timerSechage<secondesSechage){
+          etat = "HEAT";
           // On incrémente le compteur
           timerSechage++;
-
-          // Fonctionnement senseur de température
-          currentTemp = dht.readTemperature();
-
-          Serial.print("Température : ");
-          Serial.println(currentTemp);
-
-
-          displayGoodScreen(etat, currentTemp, timerSechage);
-
-          delay(1000);
         }
-        timerSechage = 0;
+        else{
+          etat = "OFF";
+          buttonPressed = false;
+          timerSechage = 0;
+        }
+
+
       }
       else
       {
